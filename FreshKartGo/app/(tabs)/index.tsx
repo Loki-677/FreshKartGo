@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, TouchableOpacity, Image, FlatList } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -22,15 +22,6 @@ type Product = {
 };
 
 export default function HomeScreen() {
-  const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
-
-  const welcomeHeader = (
-    <View style={styles.parallaxBackground}>
-      <ThemedText style={styles.welcomeText}>Welcome to FreshKartGo</ThemedText>
-      <ThemedText style={styles.welcomeSubtext}>Fresh groceries delivered to your door</ThemedText>
-    </View>
-  );
-
   const categories: Category[] = [
     { id: 'all', name: 'All', icon: 'square.grid.2x2.fill' },
     { id: 'fruits', name: 'Fruits', icon: 'leaf.fill' },
@@ -49,81 +40,95 @@ export default function HomeScreen() {
     { id: '1', name: 'Fresh Apples', price: 4.99, image: 'apple.fill', category: 'fruits' },
     { id: '2', name: 'Organic Bananas', price: 3.99, image: 'banana.fill', category: 'fruits' },
     { id: '3', name: 'Fresh Carrots', price: 2.99, image: 'carrot.fill', category: 'vegetables' },
-    { id: '4', name: 'Organic Milk', price: 5.99, image: 'cup.and.saucer.fill', category: 'dairy' },
-    { id: '5', name: 'Whole Wheat Bread', price: 3.49, image: 'birthday.cake.fill', category: 'bakery' },
-    { id: '6', name: 'Fresh Orange Juice', price: 4.49, image: 'mug.fill', category: 'beverages' },
-    { id: '7', name: 'Greek Yogurt', price: 2.99, image: 'cup.and.saucer.fill', category: 'dairy' },
-    { id: '8', name: 'Mixed Berries', price: 6.99, image: 'leaf.fill', category: 'fruits' },
-    { id: '9', name: 'Chicken Breast', price: 8.99, image: 'flame.fill', category: 'meat' },
-    { id: '10', name: 'Fresh Salmon', price: 12.99, image: 'water.waves', category: 'seafood' },
-    { id: '11', name: 'Ice Cream', price: 5.99, image: 'snowflake', category: 'frozen' },
-    { id: '12', name: 'Pasta', price: 2.49, image: 'cart.fill', category: 'pantry' }
+    { id: '4', name: 'Whole Milk', price: 3.49, image: 'cup.and.saucer.fill', category: 'dairy' }
   ];
 
   const specialOffers: Product[] = [
-    { id: '1', name: 'Premium Milk', price: 5.99, discount: 20, image: 'cup.and.saucer.fill', category: 'dairy' },
-    { id: '2', name: 'Whole Grain Bread', price: 4.99, discount: 15, image: 'birthday.cake.fill', category: 'bakery' },
-    { id: '3', name: 'Fresh Orange Juice', price: 4.49, discount: 25, image: 'mug.fill', category: 'beverages' },
-    { id: '4', name: 'Organic Eggs', price: 5.99, discount: 30, image: 'egg.fill', category: 'dairy' },
-    { id: '5', name: 'Fresh Strawberries', price: 6.99, discount: 20, image: 'leaf.fill', category: 'fruits' }
+    { id: '5', name: 'Premium Coffee', price: 15.99, image: 'mug.fill', category: 'beverages', discount: 20 },
+    { id: '6', name: 'Fresh Bread', price: 5.99, image: 'birthday.cake.fill', category: 'bakery', discount: 15 },
+    { id: '7', name: 'Mixed Nuts', price: 12.99, image: 'leaf.fill', category: 'snacks', discount: 25 }
   ];
 
-  const filteredProducts = React.useMemo(() => {
-    if (selectedCategory === 'all') return allProducts;
-    return allProducts.filter(product => product.category === selectedCategory);
-  }, [selectedCategory]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const filteredOffers = React.useMemo(() => {
-    if (selectedCategory === 'all') return specialOffers;
-    return specialOffers.filter(offer => offer.category === selectedCategory);
-  }, [selectedCategory]);
+  const filteredProducts = selectedCategory === 'all'
+    ? allProducts
+    : allProducts.filter(product => product.category === selectedCategory);
+
+  const filteredOffers = selectedCategory === 'all'
+    ? specialOffers
+    : specialOffers.filter(product => product.category === selectedCategory);
 
   const renderCategory = ({ item }: { item: Category }) => (
     <TouchableOpacity 
-      style={styles.categoryItem}
-      onPress={() => router.push(`/category/${item.id}?name=${item.name}`)}
+      style={[styles.categoryItem, selectedCategory === item.id && styles.selectedCategory]}
+      onPress={() => setSelectedCategory(item.id)}
     >
-      <ThemedView style={styles.categoryIcon}>
-        <IconSymbol name={item.icon} size={24} color="#808080" />
-      </ThemedView>
-      <ThemedText style={styles.categoryName}>{item.name}</ThemedText>
+      <IconSymbol 
+        name={item.icon} 
+        size={24} 
+        color={selectedCategory === item.id ? '#FFFFFF' : '#808080'} 
+      />
+      <ThemedText style={[styles.categoryText, selectedCategory === item.id && styles.selectedCategoryText]}>
+        {item.name}
+      </ThemedText>
     </TouchableOpacity>
   );
 
   const renderProduct = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.productItem}>
-      <ThemedView style={styles.productImage}>
-        <IconSymbol name={item.image} size={40} color="#808080" />
-      </ThemedView>
+    <TouchableOpacity 
+      style={styles.productItem}
+      onPress={() => router.push(`/product/${item.id}`)}
+    >
+      <IconSymbol name={item.image} size={48} color="#808080" />
       <ThemedText style={styles.productName}>{item.name}</ThemedText>
-      <ThemedText style={styles.productPrice}>${item.price.toFixed(2)}</ThemedText>
+      <View style={styles.priceContainer}>
+        <ThemedText style={styles.price}>${item.price.toFixed(2)}</ThemedText>
+        {item.discount && (
+          <ThemedText style={styles.discount}>{item.discount}% OFF</ThemedText>
+        )}
+      </View>
     </TouchableOpacity>
   );
 
   const renderSpecialOffer = ({ item }: { item: Product }) => (
-    <TouchableOpacity style={styles.offerItem}>
-      <ThemedView style={styles.offerImage}>
-        <IconSymbol name={item.image} size={40} color="#808080" />
-      </ThemedView>
-      <View style={styles.offerInfo}>
-        <ThemedText style={styles.offerName}>{item.name}</ThemedText>
-        <View style={styles.offerPricing}>
-          <ThemedText style={styles.offerPrice}>
-            ${(item.price * (1 - (item.discount || 0) / 100)).toFixed(2)}
-          </ThemedText>
-          <ThemedText style={styles.offerOriginal}>${item.price.toFixed(2)}</ThemedText>
-          <ThemedView style={styles.discountBadge}>
-            <ThemedText style={styles.discountText}>{item.discount}% OFF</ThemedText>
-          </ThemedView>
+    <TouchableOpacity 
+      style={styles.offerItem}
+      onPress={() => router.push(`/product/${item.id}`)}
+    >
+      <View style={styles.offerContent}>
+        <IconSymbol name={item.image} size={64} color="#808080" />
+        <View style={styles.offerDetails}>
+          <ThemedText style={styles.offerName}>{item.name}</ThemedText>
+          <View style={styles.offerPriceContainer}>
+            <ThemedText style={styles.offerPrice}>${item.price.toFixed(2)}</ThemedText>
+            {item.discount && (
+              <ThemedText style={styles.offerDiscount}>{item.discount}% OFF</ThemedText>
+            )}
+          </View>
         </View>
       </View>
     </TouchableOpacity>
   );
 
+  const welcomeHeader = (
+    <View style={styles.parallaxBackground}>
+      <Image 
+        source={require('@/assets/images/logo.png')} 
+        style={styles.logoImage} 
+        resizeMode="cover"
+      />
+      <View style={styles.textContainer}>
+        <ThemedText style={styles.welcomeText}>Welcome to FreshKartGo</ThemedText>
+        <ThemedText style={styles.welcomeSubtext}>Fresh groceries delivered to your door</ThemedText>
+      </View>
+    </View>
+  );
+
   return (
     <ParallaxScrollView
       headerImage={welcomeHeader}
-      headerBackgroundColor={{ dark: '#C6A052', light: '#C6A052' }}
+      headerBackgroundColor={{ dark: 'transparent', light: 'transparent' }}
     >
       <ThemedView style={styles.content}>
         <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
@@ -162,9 +167,26 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   parallaxBackground: {
-    flex: 1,
-    justifyContent: 'center',
+    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    height: 300, // Increased height for better visibility
+    width: '100%',
+    position: 'relative',
+  },
+  logoImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    opacity: 0.8, // Increased opacity to make the logo more visible
+  },
+  textContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)', // Semi-transparent overlay for better text readability
   },
   welcomeText: {
     fontSize: 24,

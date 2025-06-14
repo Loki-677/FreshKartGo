@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, Redirect } from 'expo-router';
+import { Stack } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
@@ -13,7 +13,7 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         {!user ? (
           <Stack.Screen 
             name="auth/sign-in"

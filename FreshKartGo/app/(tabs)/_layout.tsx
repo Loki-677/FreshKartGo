@@ -14,7 +14,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
-        headerShown: false,
+        headerShown: true,
         tabBarButton: HapticTab,
         tabBarStyle: Platform.select({
           ios: {
@@ -27,6 +27,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          headerTitle: 'Home',
           tabBarIcon: ({ color }) => <MaterialIcons name="home" size={28} color={color} />,
         }}
       />
@@ -34,6 +35,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: 'Explore',
+          headerTitle: 'Explore',
           tabBarIcon: ({ color }) => <MaterialIcons name="explore" size={28} color={color} />,
         }}
       />
@@ -41,6 +43,7 @@ export default function TabLayout() {
         name="cart"
         options={{
           title: 'Cart',
+          headerTitle: 'Cart',
           tabBarIcon: ({ color }) => <MaterialIcons name="shopping-cart" size={28} color={color} />,
         }}
       />
@@ -48,6 +51,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
+          headerTitle: 'Profile',
           tabBarIcon: ({ color }) => <MaterialIcons name="person" size={28} color={color} />,
         }}
       />
