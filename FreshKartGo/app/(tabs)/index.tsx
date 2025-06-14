@@ -167,18 +167,20 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   parallaxBackground: {
-    padding: 20,
+    padding: 0, // Remove padding to allow full width
     alignItems: 'center',
     justifyContent: 'center',
-    height: 300, // Increased height for better visibility
+    height: 300,
     width: '100%',
     position: 'relative',
+    overflow: 'hidden', // Ensure image doesn't overflow
   },
   logoImage: {
     position: 'absolute',
     width: '100%',
     height: '100%',
-    opacity: 0.8, // Increased opacity to make the logo more visible
+    opacity: 0.8,
+    resizeMode: 'cover', // Make sure image covers the entire area
   },
   textContainer: {
     position: 'absolute',
@@ -186,7 +188,8 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)', // Semi-transparent overlay for better text readability
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    padding: 20, // Move padding to text container instead
   },
   welcomeText: {
     fontSize: 24,
